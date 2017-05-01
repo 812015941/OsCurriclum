@@ -1,0 +1,7 @@
+init
+cr x 1 
+to
+req r1
+de p1   
+cr a 1
+cr s 5

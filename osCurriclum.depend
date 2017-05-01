@@ -1,0 +1,63 @@
+# depslib dependency file v1.0
+1492954564 source:c:\users\812015941\documents\codeblockworkspace\oscurriclum\main.cpp
+	"generic_functions.h"
+	"processInput_functions.h"
+
+1493020850 c:\users\812015941\documents\codeblockworkspace\oscurriclum\generic_functions.h
+	<string>
+	<fstream>
+	<sstream>
+	<map>
+	<iostream>
+	<stdlib.h>
+	<vector>
+	"PCB.h"
+	"ResourceCB.h"
+
+1492849566 c:\users\812015941\documents\codeblockworkspace\oscurriclum\rcb.h
+	"PCB.h"
+
+1492953051 c:\users\812015941\documents\codeblockworkspace\oscurriclum\pcb.h
+	<string>
+	<fstream>
+	<sstream>
+	<map>
+	<iostream>
+	<stdlib.h>
+	<vector>
+
+1492867978 c:\users\812015941\documents\codeblockworkspace\oscurriclum\rl.h
+
+1493021027 c:\users\812015941\documents\codeblockworkspace\oscurriclum\resourcecb.h
+	<string>
+	<fstream>
+	<sstream>
+	<map>
+	<iostream>
+	<stdlib.h>
+	<vector>
+
+1492866958 c:\users\812015941\documents\codeblockworkspace\oscurriclum\test.h
+	<iostream>
+	<string>
+	<fstream>
+	<sstream>
+	<map>
+	<iostream>
+	<stdlib.h>
+	<vector>
+
+1492867002 source:c:\users\812015941\documents\codeblockworkspace\oscurriclum\wtf.cpp
+	"test.h"
+	"PCB.h"
+	"ResourceCB.h"
+
+1492871483 source:c:\users\812015941\documents\codeblockworkspace\oscurriclum\generic_functions.cpp
+	"generic_functions.h"
+	"PCB.h"
+	"ResourceCB.h"
+	"RL.h"
+
+1493020057 c:\users\812015941\documents\codeblockworkspace\oscurriclum\processinput_functions.h
+	"generic_functions.h"
+
