@@ -8,11 +8,14 @@
 #include <iostream>
 #include <stdlib.h>
 #include <vector>
+#include <queue>
 #include "PCB.h"
 #include "ResourceCB.h"
+
 extern _PCB_Map PCB_Map;
 _ResourceCB_Map ResourceCB_Map;
 using namespace std;
+
 void displayParentsAndChildren(string PID);
 void displayAllMaps();
 void create(string PID,unsigned int priority);
@@ -23,8 +26,9 @@ void release(string RID);//释放resourceCB中的资源，然后更新runningPCB
 void remove(ResourceCB resourceCB,PCB runningPCB);//单纯从pcb中释放resources资源，然后更新pcb_map
 void insertBlock(ResourceCB resourceCB,PCB pcb);
 //void insert(RL rl, PCB p);//wb
-//void time_out();//wb
-//void scheduler();//wb
+void time_out();//wb
+void scheduler(string pid);//wb
+void preempt(PCB p);
 void kill_Tree(string PID);
 //创建(create)： (none) -> ready
 //撤销(destroy)： running/ready/blocked -> (none)
@@ -81,11 +85,15 @@ void create(string PID,unsigned int priority)
     PID=findRunning();
 
     if(PID.empty())
-        pcb.setType(Ptatus_Type::running);
-    else pcb.setType(Ptatus_Type::ready);
+        pcb.setType(running);
+    else pcb.setType(ready);
     PCB_Map.insert(_PCB_Map::value_type(pcb.getPID(),pcb));
 //    insert(rl,pcb);
-//    scheduler();
+    rl.push(pcb);
+    //cout << "[debug] Create: rlSize: " << rl.size() << endl;
+    //cout << "[debug] create: rlTop: " << rl.top().getPID() << endl;
+//
+    scheduler(PID);
 
 }
 void request(string RID){
@@ -111,12 +119,13 @@ void request(string RID){
     else{
         //remove(rl,runningPCB);
         insertBlock(r,runningPCB);//insert(r.waiting_List,runningProcess);
-         //scheduler();
+         //
+        scheduler(running);
     }
 
 }
 void insertBlock(ResourceCB resourceCB,PCB pcb){
-        pcb.setType(Ptatus_Type::block);
+        pcb.setType(block);
         cout<<"Debug:insertBlock. "<<pcb.getPID()<<endl;
         //remove(rl,runningPCB);
         resourceCB.waiting_List.push_back(pcb);//insert(r.waiting_List,runningProcess);
@@ -133,7 +142,8 @@ string findRunning()
     while(itor!=PCB_Map.end())
     {
         PCB temp=itor->second;
-
+        //cout << "[debug] findRunning: pid: " << temp.getPID() << endl;
+        //cout << "[debug] findRunning: status: " << temp.getPtatus_Type() << endl;
         if(temp.getPtatus_Type()==running){
                 //cout<<"find running process:"<<temp.getPID()<<endl;
                 return temp.getPID();
@@ -166,7 +176,8 @@ void kill_Tree(string PID)
 void destroy(string PID)//==Kill_Tree
 {
     kill_Tree(PID);
-    //scheduler();
+    //
+    scheduler(PID);
 }
 void release(string RID){
     ResourceCB resourceCB=ResourceCB::get_RCB(RID);
@@ -212,4 +223,45 @@ void remove(ResourceCB resourceCB,PCB runningPCB)
     //更新PCB
 
 }
+
+void scheduler(string pid)
+{
+  PCB p = rl.top();
+  cout << "[debug] scheduler: topPid: " << p.getPID() << endl;
+  PCB runP = PCB::get_PCB(pid);
+  if (pid.empty() || (runP.getPtatus_Type() != running))
+    preempt(p);
+  else if (runP.getPriority() < p.getPriority())
+    {
+      runP.setType(ready);
+      PCB_Map.erase(pid);
+      PCB_Map.insert(_PCB_Map::value_type(pid, runP));
+      rl.push(runP);
+      preempt(p);
+    }
+
+}
+
+void preempt(PCB p)
+{
+  p.setType(running);
+  PCB_Map.erase(p.getPID());
+  PCB_Map.insert(_PCB_Map::value_type(p.getPID(), p));
+  rl.pop();
+  cout << "[debug] preempt: rlTop: " << rl.top().getPID() << endl;
+}
+
+void timeout()
+{
+  string pid = findRunning();
+  PCB runP = PCB::get_PCB(pid);
+  runP.setType(ready);
+  PCB_Map.erase(pid);
+  PCB_Map.insert(_PCB_Map::value_type(pid, runP));
+  rl.push(runP);
+  cout << "[debug] timeout: pid: " << runP.getPID() << endl;
+  //cout << "[debug] timeout: rlSize: " << rl.size() << endl;
+  scheduler(pid);
+}
+
 #endif // GENERIC_FUNCTIONS_H_INCLUDED

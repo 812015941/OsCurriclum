@@ -7,6 +7,7 @@
 #include <iostream>
 #include <stdlib.h>
 #include <vector>
+#include <queue>
 using namespace std;
 typedef map<string,ResourceCB> _ResourceCB_Map;
 extern _ResourceCB_Map ResourceCB_Map;
@@ -32,7 +33,7 @@ public:
         waiting_List.assign(rhs.waiting_List.begin(),rhs.waiting_List.end());
         return *this;
     }
-    queue<PCB> waiting_List;
+    vector<PCB> waiting_List;
     unsigned int available;
     //RID: 资源的ID
     //available: 空闲单元的数量

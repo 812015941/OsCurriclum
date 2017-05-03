@@ -7,12 +7,17 @@
 #include <iostream>
 #include <stdlib.h>
 #include <vector>
+#include "generic_functions.h"
+
 using namespace std;
+void scheduler(string pid);
 enum Ptatus_Type
 {
 ready=1,block=2,running=3
 };
 class ResourceCB;
+class PCB;
+priority_queue<PCB> rl;
 class PCB{
 private:
     unsigned int priority;
@@ -30,7 +35,6 @@ public:
     string getPID() const;
 
     //enum _ptatus_Type{ready=1,running=2,block=3} ;//ptatus_Type = ready;
-
 
     // Status_List;
     vector<PCB> creation_tree_Parent;
@@ -70,7 +74,7 @@ _PCB_Map PCB_Map;
 void PCB::create(string PID,unsigned int priority)//隐式PCB *this
 {
     PCB pcb(PID,priority);
-    pcb.setType(Ptatus_Type::ready);
+    pcb.setType(ready);
     //string tmpSelf=this->getPID();
     //PCB self=PCB::get_PCB(tmpSelf);
     pcb.creation_tree_Parent.push_back(*this);
@@ -81,7 +85,10 @@ void PCB::create(string PID,unsigned int priority)//隐式PCB *this
     PCB_Map.erase(tempPID);
     PCB_Map.insert(_PCB_Map::value_type(tempPID,temp));
 //    insert(rl,pcb);
-//    scheduler();
+    rl.push(pcb);
+    cout << "[debug] pcbCreate: currentP: " << pcb.getPID() << endl;
+//
+    scheduler(tempPID);
 
 }
 
@@ -98,4 +105,10 @@ PCB PCB::get_PCB(string PID)
      PCB pcb=my_Itr->second;
      return pcb;
 }
+
+bool operator < (const PCB &p1, const PCB &p2)
+{
+  return p1.getPriority() < p2.getPriority();
+}
+
 #endif // PCB_H_INCLUDED
