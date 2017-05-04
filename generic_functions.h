@@ -11,8 +11,10 @@
 #include <queue>
 #include "PCB.h"
 #include "ResourceCB.h"
-
-extern _PCB_Map PCB_Map;
+typedef map<string,ResourceCB> _ResourceCB_Map;
+typedef map<string,PCB> _PCB_Map;
+_PCB_Map PCB_Map;
+//extern _PCB_Map PCB_Map;
 _ResourceCB_Map ResourceCB_Map;
 using namespace std;
 
@@ -263,5 +265,81 @@ void timeout()
   //cout << "[debug] timeout: rlSize: " << rl.size() << endl;
   scheduler(pid);
 }
+string PCB::getPID() const
+{
+    return this->PID;
+}
+unsigned int PCB::getPriority() const
+{
+    return this->priority;
+}
+void PCB::setType(const Ptatus_Type ptatus_Type)
+{
+    this->ptatus_Type=ptatus_Type;
+}
+Ptatus_Type PCB::getPtatus_Type() const
+{
+    return this->ptatus_Type;
+}
+
+
+void PCB::create(string PID,unsigned int priority)//隐式PCB *this
+{
+    PCB pcb(PID,priority);
+    pcb.setType(ready);
+    //string tmpSelf=this->getPID();
+    //PCB self=PCB::get_PCB(tmpSelf);
+    pcb.creation_tree_Parent.push_back(*this);
+    PCB_Map.insert(_PCB_Map::value_type(PID,pcb));
+    this->creation_tree_Children.push_back(pcb);
+    PCB temp=*this;
+    string tempPID=temp.getPID();
+    PCB_Map.erase(tempPID);
+    PCB_Map.insert(_PCB_Map::value_type(tempPID,temp));
+//    insert(rl,pcb);
+    rl.push(pcb);
+    cout << "[debug] pcbCreate: currentP: " << pcb.getPID() << endl;
+//
+    scheduler(tempPID);
+
+}
+
+
+PCB PCB::get_PCB(string PID)
+{
+    _PCB_Map::iterator  my_Itr=PCB_Map.find(PID);
+    if(my_Itr==PCB_Map.end())
+    {
+        //没找到
+        PCB pcb;
+        return pcb;
+    }
+     PCB pcb=my_Itr->second;
+     return pcb;
+}
+
+bool operator < (const PCB &p1, const PCB &p2)
+{
+  return p1.getPriority() < p2.getPriority();
+}
+
+string ResourceCB::getRID() const
+{
+    return this->RID;
+}
+
+
+ResourceCB ResourceCB::get_RCB(string RID){
+    _ResourceCB_Map::iterator  my_Itr=ResourceCB_Map.find(RID);
+     if(my_Itr==ResourceCB_Map.end())
+    {
+        //没找到
+        ResourceCB rcb;
+        return rcb;
+    }
+    ResourceCB rcb=my_Itr->second;
+    return rcb;
+}
+
 
 #endif // GENERIC_FUNCTIONS_H_INCLUDED

@@ -9,8 +9,8 @@
 #include <vector>
 #include <queue>
 using namespace std;
-typedef map<string,ResourceCB> _ResourceCB_Map;
-extern _ResourceCB_Map ResourceCB_Map;
+
+extern map<string,ResourceCB> ResourceCB_Map;
 class PCB;
 
 class ResourceCB
@@ -24,7 +24,7 @@ public:
     ResourceCB(){};
     ResourceCB(const string name):RID(name){
     this->available=initialNumber;
-    ResourceCB_Map.insert(_ResourceCB_Map::value_type(RID,*this));
+    ResourceCB_Map.insert(map<string,ResourceCB>::value_type(RID,*this));
     };
     ResourceCB& operator = (ResourceCB const& rhs){
         /*if( &rhs == this) return *this;*/
@@ -39,22 +39,6 @@ public:
     //available: 空闲单元的数量
     //Waiting_List:block的PCB。
 };
-string ResourceCB::getRID() const
-{
-    return this->RID;
-}
 
-
-ResourceCB ResourceCB::get_RCB(string RID){
-    _ResourceCB_Map::iterator  my_Itr=ResourceCB_Map.find(RID);
-     if(my_Itr==ResourceCB_Map.end())
-    {
-        //没找到
-        ResourceCB rcb;
-        return rcb;
-    }
-    ResourceCB rcb=my_Itr->second;
-    return rcb;
-}
 
 #endif // RESOURCECB_H_INCLUDED

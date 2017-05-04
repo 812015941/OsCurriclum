@@ -7,17 +7,15 @@
 #include <iostream>
 #include <stdlib.h>
 #include <vector>
-#include "generic_functions.h"
-
+#include <queue>
 using namespace std;
+
 void scheduler(string pid);
 enum Ptatus_Type
 {
 ready=1,block=2,running=3
 };
 class ResourceCB;
-class PCB;
-priority_queue<PCB> rl;
 class PCB{
 private:
     unsigned int priority;
@@ -52,63 +50,7 @@ public:
 //•Priority: 0, 1, 2 (Init, User, System)//构造函数
 
 };
-string PCB::getPID() const
-{
-    return this->PID;
-}
-unsigned int PCB::getPriority() const
-{
-    return this->priority;
-}
-void PCB::setType(const Ptatus_Type ptatus_Type)
-{
-    this->ptatus_Type=ptatus_Type;
-}
-Ptatus_Type PCB::getPtatus_Type() const
-{
-    return this->ptatus_Type;
-}
-typedef map<string,PCB> _PCB_Map;
-_PCB_Map PCB_Map;
+priority_queue<PCB> rl;
 
-void PCB::create(string PID,unsigned int priority)//隐式PCB *this
-{
-    PCB pcb(PID,priority);
-    pcb.setType(ready);
-    //string tmpSelf=this->getPID();
-    //PCB self=PCB::get_PCB(tmpSelf);
-    pcb.creation_tree_Parent.push_back(*this);
-    PCB_Map.insert(_PCB_Map::value_type(PID,pcb));
-    this->creation_tree_Children.push_back(pcb);
-    PCB temp=*this;
-    string tempPID=temp.getPID();
-    PCB_Map.erase(tempPID);
-    PCB_Map.insert(_PCB_Map::value_type(tempPID,temp));
-//    insert(rl,pcb);
-    rl.push(pcb);
-    cout << "[debug] pcbCreate: currentP: " << pcb.getPID() << endl;
-//
-    scheduler(tempPID);
-
-}
-
-
-PCB PCB::get_PCB(string PID)
-{
-    _PCB_Map::iterator  my_Itr=PCB_Map.find(PID);
-    if(my_Itr==PCB_Map.end())
-    {
-        //没找到
-        PCB pcb;
-        return pcb;
-    }
-     PCB pcb=my_Itr->second;
-     return pcb;
-}
-
-bool operator < (const PCB &p1, const PCB &p2)
-{
-  return p1.getPriority() < p2.getPriority();
-}
 
 #endif // PCB_H_INCLUDED
